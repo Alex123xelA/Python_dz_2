@@ -7,7 +7,7 @@ def main():
 
     df = select_dataframe()
 
-    print("Выберите действие:\n1. Создать текстовый отчет\n2. Построить график")
+    print("Выберите действие:\n1. Создать текстовый отчет\n2. Построить график\n3. Круговая диаграмма")
     choice = input("Ваш выбор: ")
 
     if choice == "1":
@@ -21,6 +21,10 @@ def main():
         x = input("Введите X (независимая переменная): ")
         y = input("Введите Y (зависимая переменная): ")
         plot_price_vs_quantity(df, x, y)
+
+    elif choice == "3":
+        col = input("Введите имя колонки для круговой диаграммы: ")
+        plot_pie_chart_by_column(df, col)
 
 if __name__ == "__main__":
     main()
