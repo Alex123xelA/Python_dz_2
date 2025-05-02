@@ -39,3 +39,20 @@ def plot_pie_chart_by_column(df, column_name):
     plt.ylabel('')
     plt.tight_layout()
     plt.show()
+    
+def plot_bar(df, column_name):
+    """
+    Создаёт столбчатую диаграмму: по x - элементы, по y - колличество вхождений.
+    """
+    if column_name not in df.columns:
+        print(f"Колонка '{column_name}' не найдена.")
+        return
+    value_counts = df[column_name].value_counts()
+    if value_counts.empty:
+        print(f"Нет данных для колонки '{column_name}'.")
+        return 
+    value_counts.plot.bar()
+    plt.yticks(range(0,max(value_counts)+1,1))
+    plt.tight_layout()
+    plt.title(f'Распределения количества по колонке: {column_name}', fontsize = 14)
+    plt.show()
