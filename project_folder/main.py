@@ -13,7 +13,7 @@ def main():
     if choice == "1":
         col = input("Введите колонку фильтра: ")
         val = input("Введите значение: ")
-        selected_cols = input("Введите через запятую нужные колонки: ").split(",")
+        selected_cols = input("Введите через запятую нужные колонки: ").split(", ")
         report = report_filter_by_criteria(df, {col: val}, selected_cols)
         print(report)
 
