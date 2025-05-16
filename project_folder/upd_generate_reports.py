@@ -91,7 +91,7 @@ def plot_bar(df: pd.DataFrame, column_name: str) -> None:
     )
     plt.show()
 
-def sum_table(df):
+def pivot_table(df):
     """
     Создаёт сводную таблицу по выбранным пользователем параметрам.
     """
