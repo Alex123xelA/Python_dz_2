@@ -1,15 +1,10 @@
 import os
 import pandas as pd
 
+
 def select_dataframe() -> pd.DataFrame:
     """
-    Позволяет пользователю выбрать один из доступных .pkl-файлов в папке ./data
-    и загружает соответствующий DataFrame.
-
-    Returns
-    -------
-    pd.DataFrame
-        Загруженный DataFrame с очищенными названиями колонок.
+    Позволяет пользователю выбрать один из .pkl-файлов и загружает DataFrame.
     """
     files = [f for f in os.listdir("./data") if f.endswith(".pkl")]
     if not files:
@@ -26,32 +21,22 @@ def select_dataframe() -> pd.DataFrame:
     df = pd.read_pickle(os.path.join("./data", files[index]))
     df.columns = df.columns.str.strip()
 
-    print("\nКолонки справочника:")
+    print("\nКолонки:")
     for i, col in enumerate(df.columns):
         print(f"{i + 1}. {col}")
-
     print("\nПервые строки таблицы:")
     print(df.head())
-
     return df
 
 
 def load_excel_to_pickle(excel_path: str = 'DZ_2.xlsx', output_dir: str = './data/') -> None:
     """
     Загружает все листы Excel-файла (кроме первого) и сохраняет каждый как .pkl-файл.
-
-    Parameters
-    ----------
-    excel_path : str
-        Путь к Excel-файлу (по умолчанию 'DZ_2.xlsx').
-
-    output_dir : str
-        Каталог для сохранения .pkl файлов (по умолчанию './data/').
     """
     os.makedirs(output_dir, exist_ok=True)
 
     xl = pd.ExcelFile(excel_path)
-    sheet_names = xl.sheet_names[1:]  # Пропустить первый лист
+    sheet_names = xl.sheet_names[1:]
     if not sheet_names:
         raise ValueError("Excel-файл не содержит листов кроме первого.")
 
