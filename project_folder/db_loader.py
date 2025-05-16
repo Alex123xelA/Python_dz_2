@@ -29,9 +29,11 @@ def select_dataframe() -> pd.DataFrame:
     return df
 
 
-def load_excel_to_pickle(excel_path: str = 'DZ_2.xlsx', output_dir: str = './data/') -> None:
+def load_excel_to_pickle(excel_path: str = "DZ_1.xlsx", output_dir: str = "./data/") -> None:
     """
     Загружает все листы Excel-файла (кроме первого) и сохраняет каждый как .pkl-файл.
+
+    Проверяет, существует ли файл и содержит ли он нужные листы данных.
 
     Parameters
     ----------
@@ -40,18 +42,40 @@ def load_excel_to_pickle(excel_path: str = 'DZ_2.xlsx', output_dir: str = './dat
 
     output_dir : str
         Каталог для сохранения .pkl файлов (по умолчанию './data/').
+
+    Raises
+    ------
+    FileNotFoundError
+        Если указанный Excel-файл не найден.
+
+    ValueError
+        Если в Excel-файле только один лист (обычно описание проекта).
     """
-    os.makedirs(output_dir, exist_ok=True)
+    if not os.path.exists(excel_path):
+        raise FileNotFoundError(
+            f"[Ошибка] Файл '{excel_path}' не найден. Убедитесь, что файл существует."
+        )
 
     xl = pd.ExcelFile(excel_path)
-    sheet_names = xl.sheet_names[1:]  # Пропустить первый лист
-    if not sheet_names:
-        raise ValueError("Excel-файл не содержит листов кроме первого.")
+    sheet_names = xl.sheet_names
 
-    for sheet in sheet_names:
+    if len(sheet_names) <= 1:
+        raise ValueError(
+            "[Ошибка] Файл содержит только один лист (вероятно, описание проекта). "
+            "Для загрузки справочников необходимо минимум два листа."
+        )
+
+    sheets_to_process = sheet_names[1:]  # Пропустить первый лист
+    os.makedirs(output_dir, exist_ok=True)
+
+    print("[Инфо] Найденные листы для обработки:")
+    for sheet in sheets_to_process:
+        print(f" - {sheet}")
+
+    for sheet in sheets_to_process:
         df = xl.parse(sheet)
         df.columns = df.columns.str.strip()
-        file_path = os.path.join(output_dir, f'{sheet}.pkl')
+        file_path = os.path.join(output_dir, f"{sheet}.pkl")
         df.to_pickle(file_path)
         print(f"[✓] Сохранено: {sheet}.pkl")
 
