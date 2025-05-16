@@ -27,6 +27,7 @@ def main():
         plot_pie_chart_by_column(df, col)
 
     elif choice == "4":
+        col = input("Построение сводной таблицы: ")
         create_pivot_table(df)
 
 if __name__ == "__main__":
