@@ -25,7 +25,14 @@ def select_dataframe() -> pd.DataFrame:
 
     df = pd.read_pickle(os.path.join("./data", files[index]))
     df.columns = df.columns.str.strip()
-    print("Колонки:", df.columns.tolist())
+
+    print("\nКолонки справочника:")
+    for i, col in enumerate(df.columns):
+        print(f"{i + 1}. {col}")
+
+    print("\nПервые строки таблицы:")
+    print(df.head())
+
     return df
 
 
