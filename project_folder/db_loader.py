@@ -29,11 +29,14 @@ def select_dataframe() -> pd.DataFrame:
     return df
 
 
-def load_excel_to_pickle(excel_path: str = "DZ_1.xlsx", output_dir: str = "./data/") -> None:
+def load_excel_to_pickle(excel_path: str = 'DZ_2.xlsx', output_dir: str = './data/') -> None:
     """
     Загружает все листы Excel-файла (кроме первого) и сохраняет каждый как .pkl-файл.
 
-    Проверяет, существует ли файл и содержит ли он нужные листы данных.
+    Производит следующие проверки:
+    - Файл существует.
+    - В файле больше одного листа (первый — описание проекта).
+    - Листы не пустые (должны содержать как заголовки, так и данные).
 
     Parameters
     ----------
@@ -49,33 +52,38 @@ def load_excel_to_pickle(excel_path: str = "DZ_1.xlsx", output_dir: str = "./dat
         Если указанный Excel-файл не найден.
 
     ValueError
-        Если в Excel-файле только один лист (обычно описание проекта).
+        Если в файле только один лист или все листы (кроме первого) пустые.
     """
-    if not os.path.exists(excel_path):
-        raise FileNotFoundError(
-            f"[Ошибка] Файл '{excel_path}' не найден. Убедитесь, что файл существует."
-        )
+    if not os.path.isfile(excel_path):
+        raise FileNotFoundError(f"[Ошибка] Файл '{excel_path}' не найден. Убедитесь, что он находится в нужной папке.")
 
     xl = pd.ExcelFile(excel_path)
     sheet_names = xl.sheet_names
 
     if len(sheet_names) <= 1:
-        raise ValueError(
-            "[Ошибка] Файл содержит только один лист (вероятно, описание проекта). "
-            "Для загрузки справочников необходимо минимум два листа."
-        )
+        raise ValueError("[Ошибка] В Excel-файле только один лист (возможно, описание проекта). "
+                         "Необходимо как минимум два листа, чтобы загрузить данные.")
 
     sheets_to_process = sheet_names[1:]  # Пропустить первый лист
-    os.makedirs(output_dir, exist_ok=True)
-
-    print("[Инфо] Найденные листы для обработки:")
-    for sheet in sheets_to_process:
-        print(f" - {sheet}")
+    valid_sheets = []
 
     for sheet in sheets_to_process:
         df = xl.parse(sheet)
+        if df.empty or df.dropna(how='all').shape[0] <= 1:
+            print(f"[Предупреждение] Лист '{sheet}' пропущен: он пустой или содержит только заголовки.")
+            continue
+        valid_sheets.append((sheet, df))
+
+    if not valid_sheets:
+        raise ValueError("[Ошибка] Все листы (кроме первого) пустые или содержат только заголовки. "
+                         "Нет данных для сохранения.")
+
+    os.makedirs(output_dir, exist_ok=True)
+
+    print("[Инфо] Загружаются следующие листы:")
+    for sheet, df in valid_sheets:
         df.columns = df.columns.str.strip()
-        file_path = os.path.join(output_dir, f"{sheet}.pkl")
+        file_path = os.path.join(output_dir, f'{sheet}.pkl')
         df.to_pickle(file_path)
         print(f"[✓] Сохранено: {sheet}.pkl")
 
